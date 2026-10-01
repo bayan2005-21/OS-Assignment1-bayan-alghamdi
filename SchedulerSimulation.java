@@ -1,4 +1,4 @@
-import java.util.LinkedList;
+ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Map;
 import java.util.HashMap;
@@ -29,13 +29,16 @@ class Process implements Runnable {
     private int burstTime; // Total time the process requires to complete (in milliseconds)
     private int timeQuantum; // Time slice (time quantum) allowed per CPU access (in milliseconds)
     private int remainingTime; // Time left for the process to finish its execution
+    private int priority; 
 
     // Constructor to initialize the process with name, burst time, and time quantum
-    public Process(String name, int burstTime, int timeQuantum) {
+    public Process(String name, int burstTime, int timeQuantum, int priority) {
         this.name = name;
         this.burstTime = burstTime;
         this.timeQuantum = timeQuantum;
         this.remainingTime = burstTime; // Initially, remaining time is equal to the burst time
+        Random ran = new Random();
+        this.priority = ran.nextInt(10)+1;
     }
 
     // This method will be called when the thread for this process is started
@@ -136,7 +139,10 @@ class Process implements Runnable {
     public int getRemainingTime() {
         return remainingTime;
     }
+public int getPriority(){
+    return priority;
 
+}
     // Check if the process has finished (i.e., no remaining time)
     public boolean isFinished() {
         return remainingTime <= 0;
@@ -196,11 +202,13 @@ public class SchedulerSimulation {
             // Random burst time for each process between timeQuantum/2 and 3*timeQuantum
             int burstTime = timeQuantum/2 + random.nextInt(2 * timeQuantum + 1);
             
+            int priority = random.nextInt(10)+1;
             // Create a new process object with a unique name, burst time, and the defined time quantum
-            Process process = new Process("P" + i, burstTime, timeQuantum);
+            Process process = new Process("P" + i,burstTime,timeQuantum, priority );
             
             // Add the process to the ready queue and the map
             addProcessToQueue(process, processQueue, processMap);
+            System.out.println("process " + process.getName()+ " enterd the rady queue with priority: " + process.getPriority());
         }
         
         // Start of the scheduler simulation

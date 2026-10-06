@@ -1,4 +1,4 @@
- import java.util.LinkedList;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Map;
 import java.util.HashMap;
@@ -30,6 +30,11 @@ class Process implements Runnable {
     private int timeQuantum; // Time slice (time quantum) allowed per CPU access (in milliseconds)
     private int remainingTime; // Time left for the process to finish its execution
     private int priority; 
+    private static final Random random = new Random(); // Random generator for priority assignment
+    private int waitingTime = 0 ; // Time the process has been waiting in the queue (in milliseconds)
+    private int arrivalTime = 0; // Time when the process arrives in the ready queue (in milliseconds)
+    private int completionTime = 0; // Time when the process completes its execution (in milliseconds)
+
 
     // Constructor to initialize the process with name, burst time, and time quantum
     public Process(String name, int burstTime, int timeQuantum, int priority) {
@@ -37,8 +42,7 @@ class Process implements Runnable {
         this.burstTime = burstTime;
         this.timeQuantum = timeQuantum;
         this.remainingTime = burstTime; // Initially, remaining time is equal to the burst time
-        Random ran = new Random();
-        this.priority = ran.nextInt(10)+1;
+        this.priority = random.nextInt(10)+1;
     }
 
     // This method will be called when the thread for this process is started
@@ -139,6 +143,9 @@ class Process implements Runnable {
     public int getRemainingTime() {
         return remainingTime;
     }
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
+    }
 public int getPriority(){
     return priority;
 
@@ -147,15 +154,46 @@ public int getPriority(){
     public boolean isFinished() {
         return remainingTime <= 0;
     }
+ public int getWaitingTime() {
+        return waitingTime;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(int arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public int getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(int completionTime) {
+        this.completionTime = completionTime;
+    }
+    public int getTimeQuantum() {
+        return timeQuantum;
+    }
+    public void setTimeQuantum(int timeQuantum) {
+        this.timeQuantum = timeQuantum;
+    }
+
 }
 
 public class SchedulerSimulation {
     public static int contextSwichCount = 0;
+     
     public static void main(String[] args) {
         // ⚠️ IMPORTANT: Put your student ID here to seed the random number generator
         // This makes your output unique to you - DO NOT forget to change this!
         int studentID = 445052469;  // ← CHANGE THIS TO YOUR ACTUAL STUDENT ID
-        
+        int currentTime = 0;
         Random random = new Random(studentID);
         
         // Define the time quantum in milliseconds (the maximum time a process gets in one round)
@@ -227,9 +265,19 @@ public class SchedulerSimulation {
         // Loop to manage the scheduling of processes
         while (!processQueue.isEmpty()) {
             contextSwichCount++;
-            // Get the next thread from the queue (FIFO)
+        
+        // Get the next thread from the queue (FIFO)
             Thread currentThread = processQueue.poll(); // Dequeues the next thread
             
+            Process p = processMap.get(currentThread); // Get the associated process
+             int executionTime = Math.min(p.getRemainingTime(), p.getTimeQuantum()); // Determine how long to run this process
+            currentTime += executionTime; // Update the current time
+            p.setRemainingTime(p.getRemainingTime() - executionTime); // Update remaining time
+            if (p.getRemainingTime() <= 0) {
+                p.setCompletionTime(currentTime); // Set completion time if finished
+            int waitingTime = currentTime - p.getArrivalTime() - p.getBurstTime();
+                p.setWaitingTime(waitingTime); // Set waiting time
+            }
             // Print the current process queue (list of process IDs in the queue)
             System.out.println(Colors.BOLD + Colors.MAGENTA + "┌─ Ready Queue " + "─".repeat(65) + Colors.RESET);
             System.out.print(Colors.MAGENTA + "│ " + Colors.RESET + Colors.BRIGHT_WHITE + "[" + Colors.RESET);
@@ -306,5 +354,18 @@ public class SchedulerSimulation {
                           Colors.RESET + Colors.BLUE + " added to ready queue" + Colors.RESET + 
                           " │ Burst time: " + Colors.YELLOW + process.getBurstTime() + "ms" + 
                           Colors.RESET);
+    
+
+     double totalWaitingTime = 0;
+    System.out.println("Process \t  | Burst Time \t  | Waiting Time");
+    for ( Process p :processMap.values()) {
+        System.out.println(p.getName() + "\t\t  | " + p.getBurstTime() + "\t\t  | " + p.getWaitingTime());
+        totalWaitingTime += p.getWaitingTime();
     }
+            double averageWaitingTime = totalWaitingTime / processMap.values().size();
+    System.out.println("Average waiting time: " + averageWaitingTime);    
 }
+
+
+}
+ 

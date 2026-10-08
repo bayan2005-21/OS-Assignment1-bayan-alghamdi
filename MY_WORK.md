@@ -410,11 +410,11 @@ P2               | 6129          | 0
 - [x] No section headers deleted
 
 **Video**
-- [ ] 2-3 minutes long, named `StudentID_Assignment1_Demo.mp4`
-- [ ] Shows your name, ID, repository, 3 features, IDE execution, one threading concept, and commit history
-- [ ] Link is **public** (tested in an incognito window) and pasted in the **Video Link** section above
+- [x] 2-3 minutes long, named `StudentID_Assignment1_Demo.mp4`
+- [x] Shows your name, ID, repository, 3 features, IDE execution, one threading concept, and commit history
+- [x] Link is **public** (tested in an incognito window) and pasted in the **Video Link** section above
 
 **Blackboard**
-- [ ] Submit **only** the link to your public GitHub repository
+- [x] Submit **only** the link to your public GitHub repository
 
 > 🎯 **Good luck!** Start early, commit regularly, and make sure you can explain every line you submit.
